@@ -1,0 +1,129 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class Adventure {
+    private static long startTime;
+    private static boolean isFighting = false;
+    private static boolean isPortalOpen = false;
+    private static boolean isJumping = false;
+    private static int skeletonArcherHealth = 10;
+    private static boolean fighterOpensDoor = false;
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("What is your name, adventurer? ");
+        String name = input.nextLine();
+        System.out.println("Hello, " + name + "! Welcome to Adventure Game!");
+        System.out.println("To start the game, type 'start' and press Enter.");
+        String command = input.nextLine();
+        if (command.equals("start")) {
+            startGame();
+        }
+    }
+
+    public static void startGame() {
+        startTime = System.currentTimeMillis();
+        System.out.println("The game has started!");
+        System.out.println("To check the time, type '!time' and press Enter.");
+        System.out.println("To fight, type 'f' and press Enter.");
+        System.out.println("To crouch, type 'c' and press Enter.");
+        System.out.println("To jump, type 'j' and press Enter.");
+        System.out.println("To escape, type 'e' and press Enter.");
+        Scanner input = new Scanner(System.in);
+        Random rand = new Random();
+        while (true) {
+            String command = input.nextLine();
+            if (command.equals("!time")) {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                System.out.println("Elapsed time: " + elapsedTime / 1000 + " seconds");
+                if (elapsedTime / 1000 == 30) {
+                    isPortalOpen = true;
+                    System.out.println("A blue portal has opened! You can now escape by typing 'e'!");
+                }
+            } else if (command.equals("f")) {
+                if (isFighting) {
+                    System.out.println("You are already fighting!");
+                } else {
+                    isFighting = true;
+                    System.out.println("You are now fighting a skeleton archer!");
+                }
+            } else if (command.equals("c")) {
+                if (isFighting) {
+                    int dodgeChance = rand.nextInt(10);
+                    if (dodgeChance < 7) {
+                        System.out.println("You crouch and dodge the skeleton archer's attack!");
+                    } else {
+                        System.out.println("You crouch but the skeleton archer's arrow hits you!");
+                    }
+                    isFighting = false;
+                } else {
+                    System.out.println("You can't crouch if you're not fighting!");
+                }
+            } else if (command.equals("j")) {
+                if (isJumping) {
+                    System.out.println("You are already jumping!");
+                } else {
+                    isJumping = true;
+                    System.out.println("You jump over the skeleton archer's arrow!");
+                }
+            } else if (command.equals("e")) {
+                if (isFighting) {
+                    System.out.println("You can't escape while you're fighting!");
+                } else if (!isPortalOpen) {
+                    System.out.println("You can't escape yet. Wait for the blue portal to open!");
+                } else {
+                    System.out.println("You start to escape...");
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("You have successfully escaped!");
+                    break;
+                }
+            } else {
+                System.out.println("Invalid command. Type '!time', 'f', 'c', 'j', or 'e'.");
+            }
+
+            if (isFighting) {
+                int attackChance = rand.nextInt(10);
+                if (attackChance < 7) {
+                    System.out.println("The skeleton archer fires an arrow at you!");
+                    if (isJumping) {
+                        System.out.println("You jump and avoid the arrow!");
+                        isJumping = false;
+                    } else {
+                        int dodgeChance = rand.nextInt(10);
+                        if (dodgeChance < 3) {
+                            System.out.println("You dodge the arrow!");
+                        } else {
+                            System.out.println("The arrow hits you!");
+                        }
+                    }
+                } else {
+                    System.out.println("The skeleton archer is reloading...");
+                }
+
+                if (skeletonArcherHealth <= 0) {
+                    System.out.println("You have defeated the skeleton archer!");
+                    isFighting = false;
+                    fighterOpensDoor = true;
+                } else {
+                    int damage = rand.nextInt(5);
+                    System.out.println("You hit the skeleton archer for " + damage + " damage!");
+                    skeletonArcherHealth -= damage;
+                    System.out.println("The skeleton archer has " + skeletonArcherHealth + " health remaining.");
+                }
+            }
+
+            if (fighterOpensDoor) {
+                int doorChance = rand.nextInt(10);
+                if (doorChance < 5) {
+                    System.out.println("A fighter has opened the door for you!");
+                    isPortalOpen = true;
+                    fighterOpensDoor = false;
+                }
+            }
+        }
+    }
+}
